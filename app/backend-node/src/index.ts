@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
+import rateLimit from "@fastify/rate-limit";
 import "dotenv/config";
 import { registerRoutes } from "./routes/index.js";
 import { ollamaService } from "./services/ollamaService.js";
@@ -9,6 +10,11 @@ const server = Fastify({ logger: true });
 await server.register(cors, {
   origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
   credentials: true,
+});
+
+// Register rate limiting — storage route uses a per-route limit via config.rateLimit
+await server.register(rateLimit, {
+  global: false, // opt-in per route; routes that need it set config.rateLimit
 });
 
 await registerRoutes(server);

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^10",
+    "@fastify/rate-limit": "^10",
     "@langchain/anthropic": "^0.3",
     "@langchain/core": "^0.3",
     "@langchain/google-genai": "^0.1",
