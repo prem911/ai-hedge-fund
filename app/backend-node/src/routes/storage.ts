@@ -7,12 +7,19 @@ import { z } from "zod";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SaveJsonRequestSchema = z.object({
-  filename: z.string().min(1),
-  data: z.record(z.any()),
+  filename: z.string().min(1).max(255).regex(/^[\w\-.]+\.json$/, "Filename must be a safe .json filename"),
+  data: z.record(z.unknown()),
 });
 
 export async function storageRoutes(server: FastifyInstance): Promise<void> {
-  server.post("/storage/save-json", async (request, reply) => {
+  server.post("/storage/save-json", {
+    config: {
+      rateLimit: {
+        max: 30,
+        timeWindow: "1 minute",
+      },
+    },
+  }, async (request, reply) => {
     const parsed = SaveJsonRequestSchema.safeParse(request.body);
     if (!parsed.success) {
       return reply.status(400).send({ message: "Invalid request", error: parsed.error.message });
@@ -27,12 +34,18 @@ export async function storageRoutes(server: FastifyInstance): Promise<void> {
         fs.mkdirSync(outputsDir, { recursive: true });
       }
 
+      // Ensure the resolved path stays within outputsDir (prevent path traversal)
       const filePath = path.join(outputsDir, parsed.data.filename);
-      fs.writeFileSync(filePath, JSON.stringify(parsed.data.data, null, 2), "utf8");
+      const resolvedFilePath = path.resolve(filePath);
+      if (!resolvedFilePath.startsWith(path.resolve(outputsDir) + path.sep)) {
+        return reply.status(400).send({ message: "Invalid filename: path traversal not allowed" });
+      }
+
+      fs.writeFileSync(resolvedFilePath, JSON.stringify(parsed.data.data, null, 2), "utf8");
 
       return reply.send({
         success: true,
-        message: `File saved successfully to ${filePath}`,
+        message: `File saved successfully`,
         filename: parsed.data.filename,
       });
     } catch (err) {

@@ -1,4 +1,4 @@
-import { eq, desc, max } from "drizzle-orm";
+import { eq, desc, max, count, and } from "drizzle-orm";
 import { db } from "../db/connection.js";
 import { hedgeFundFlowRuns, type HedgeFundFlowRun } from "../db/schema.js";
 import type { FlowRunStatus } from "../models/schemas.js";
@@ -94,10 +94,7 @@ export async function getActiveFlowRun(flowId: number): Promise<Record<string, u
   const rows = await db
     .select()
     .from(hedgeFundFlowRuns)
-    .where(
-      eq(hedgeFundFlowRuns.flowId, flowId) &&
-        (eq(hedgeFundFlowRuns.status, "IN_PROGRESS") as unknown as ReturnType<typeof eq>)
-    )
+    .where(and(eq(hedgeFundFlowRuns.flowId, flowId), eq(hedgeFundFlowRuns.status, "IN_PROGRESS")))
     .limit(1);
   return rows[0] ? rowToFlowRun(rows[0]) : null;
 }
@@ -164,14 +161,9 @@ export async function deleteFlowRunsByFlowId(flowId: number): Promise<number> {
 }
 
 export async function getFlowRunCount(flowId: number): Promise<number> {
-  const rows = await db
-    .select({ count: max(hedgeFundFlowRuns.id) })
+  const result = await db
+    .select({ count: count() })
     .from(hedgeFundFlowRuns)
     .where(eq(hedgeFundFlowRuns.flowId, flowId));
-  // Use count via length of all results
-  const all = await db
-    .select({ id: hedgeFundFlowRuns.id })
-    .from(hedgeFundFlowRuns)
-    .where(eq(hedgeFundFlowRuns.flowId, flowId));
-  return all.length;
+  return result[0]?.count ?? 0;
 }
