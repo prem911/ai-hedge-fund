@@ -265,6 +265,7 @@ export class BacktestService {
 
     if (dailyReturns.length < 2) return;
 
+    // Annual risk-free rate (US 10-year Treasury approximation ≈ 4.34%), converted to daily
     const dailyRiskFreeRate = 0.0434 / 252;
     const excessReturns = dailyReturns.map((r) => r - dailyRiskFreeRate);
     const meanExcess = mean(excessReturns);
