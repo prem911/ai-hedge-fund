@@ -331,3 +331,54 @@ export function getAgentsList(): Array<Record<string, unknown>> {
       order: config.order,
     }));
 }
+
+// ─── buildDefaultGraphNodes ───────────────────────────────────────────────────
+/**
+ * Build the list of GraphNode objects for the standard workflow topology.
+ * Generates a unique suffix for each node to match the createGraph() convention.
+ *
+ * Topology: start → analysts → risk_management → portfolio_manager → END
+ *
+ * @param selectedAnalysts Array of analyst keys (e.g. ["warren_buffett", "technicals"])
+ * @returns Array of GraphNode objects ready to pass to createGraph()
+ */
+export function buildDefaultGraphNodes(selectedAnalysts: string[]): GraphNode[] {
+  // Use a fixed short suffix so node IDs are deterministic in CLI context
+  const suffix = "000000";
+  const nodes: GraphNode[] = [];
+
+  for (const analystKey of selectedAnalysts) {
+    if (analystKey in ANALYST_CONFIG && analystKey !== "portfolio_manager") {
+      nodes.push({ id: `${analystKey}_${suffix}`, type: "agent" });
+    }
+  }
+
+  nodes.push({ id: `portfolio_manager_${suffix}`, type: "agent" });
+  return nodes;
+}
+
+// ─── buildDefaultGraphEdges ───────────────────────────────────────────────────
+/**
+ * Build the list of GraphEdge objects for the standard workflow topology.
+ * Each analyst connects directly to the portfolio_manager node; createGraph()
+ * will automatically insert the risk_management node in between.
+ *
+ * @param selectedAnalysts Array of analyst keys (e.g. ["warren_buffett", "technicals"])
+ * @returns Array of GraphEdge objects ready to pass to createGraph()
+ */
+export function buildDefaultGraphEdges(selectedAnalysts: string[]): GraphEdge[] {
+  const suffix = "000000";
+  const edges: GraphEdge[] = [];
+
+  for (const analystKey of selectedAnalysts) {
+    if (analystKey in ANALYST_CONFIG && analystKey !== "portfolio_manager") {
+      edges.push({
+        id: `${analystKey}_${suffix}__portfolio_manager_${suffix}`,
+        source: `${analystKey}_${suffix}`,
+        target: `portfolio_manager_${suffix}`,
+      });
+    }
+  }
+
+  return edges;
+}
