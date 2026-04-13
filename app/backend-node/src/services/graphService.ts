@@ -3,29 +3,28 @@ import { HumanMessage } from "@langchain/core/messages";
 import { AgentStateAnnotation, type AgentState } from "../core/graph/state.js";
 import { portfolioManagementAgent } from "../core/agents/portfolioManager.js";
 import { riskManagementAgent } from "../core/agents/riskManager.js";
+import { aswathDamodaranAgent } from "../core/agents/aswathDamodaran.js";
+import { benGrahamAgent } from "../core/agents/benGraham.js";
+import { billAckmanAgent } from "../core/agents/billAckman.js";
+import { cathieWoodAgent } from "../core/agents/cathieWood.js";
+import { charlieMungerAgent } from "../core/agents/charlieMunger.js";
+import { michaelBurryAgent } from "../core/agents/michaelBurry.js";
+import { mohnishPabraiAgent } from "../core/agents/mohnishPabrai.js";
+import { nassimTalebAgent } from "../core/agents/nassimTaleb.js";
+import { peterLynchAgent } from "../core/agents/peterLynch.js";
+import { philFisherAgent } from "../core/agents/philFisher.js";
+import { rakeshJhunjhunwalaAgent } from "../core/agents/rakeshJhunjhunwala.js";
+import { stanleyDruckenmillerAgent } from "../core/agents/stanleyDruckenmiller.js";
+import { warrenBuffettAgent } from "../core/agents/warrenBuffett.js";
+import { technicalAnalystAgent } from "../core/agents/technicals.js";
+import { fundamentalsAnalystAgent } from "../core/agents/fundamentals.js";
+import { growthAnalystAgent } from "../core/agents/growthAgent.js";
+import { newsSentimentAgent } from "../core/agents/newsSentiment.js";
+import { sentimentAnalystAgent } from "../core/agents/sentiment.js";
+import { valuationAnalystAgent } from "../core/agents/valuation.js";
 import type { GraphNode, GraphEdge } from "../models/schemas.js";
 
-// ─── ANALYST_CONFIG ────────────────────────────────────────────────────────────
-// Maps analyst keys to placeholder agent functions.
-// Phase 3+ agents are stubs — replace with real implementations as they are migrated.
-
 type AgentFunction = (state: AgentState) => Promise<Partial<AgentState>>;
-
-function placeholderAgent(key: string): AgentFunction {
-  return async (state: AgentState) => {
-    console.warn(`[${key}] Analyst agent not yet migrated (Phase 3+). Returning empty signal.`);
-    const data = state.data as Record<string, unknown>;
-    const existingSignals = (data["analyst_signals"] as Record<string, unknown>) ?? {};
-    return {
-      data: {
-        analyst_signals: {
-          ...existingSignals,
-          [key]: { signal: null, confidence: 0, reasoning: "Agent not yet migrated" },
-        },
-      },
-    };
-  };
-}
 
 export const ANALYST_CONFIG: Record<
   string,
@@ -35,133 +34,133 @@ export const ANALYST_CONFIG: Record<
     display_name: "Aswath Damodaran",
     description: "The Dean of Valuation",
     investing_style: "Focuses on intrinsic value and financial metrics.",
-    agent_func: placeholderAgent("aswath_damodaran"),
+    agent_func: (state) => aswathDamodaranAgent(state, "aswath_damodaran_agent"),
     order: 0,
   },
   ben_graham: {
     display_name: "Ben Graham",
     description: "The Father of Value Investing",
     investing_style: "Emphasizes a margin of safety and invests in undervalued companies.",
-    agent_func: placeholderAgent("ben_graham"),
+    agent_func: (state) => benGrahamAgent(state, "ben_graham_agent"),
     order: 1,
   },
   bill_ackman: {
     display_name: "Bill Ackman",
     description: "The Activist Investor",
     investing_style: "Seeks to influence management and unlock value.",
-    agent_func: placeholderAgent("bill_ackman"),
+    agent_func: (state) => billAckmanAgent(state, "bill_ackman_agent"),
     order: 2,
   },
   cathie_wood: {
     display_name: "Cathie Wood",
     description: "The Queen of Growth Investing",
     investing_style: "Focuses on disruptive innovation and growth.",
-    agent_func: placeholderAgent("cathie_wood"),
+    agent_func: (state) => cathieWoodAgent(state, "cathie_wood_agent"),
     order: 3,
   },
   charlie_munger: {
     display_name: "Charlie Munger",
     description: "The Rational Thinker",
     investing_style: "Advocates for value investing with a focus on quality businesses.",
-    agent_func: placeholderAgent("charlie_munger"),
+    agent_func: (state) => charlieMungerAgent(state, "charlie_munger_agent"),
     order: 4,
   },
   michael_burry: {
     display_name: "Michael Burry",
     description: "The Big Short Contrarian",
     investing_style: "Makes contrarian bets on overvalued markets.",
-    agent_func: placeholderAgent("michael_burry"),
+    agent_func: (state) => michaelBurryAgent(state, "michael_burry_agent"),
     order: 5,
   },
   mohnish_pabrai: {
     display_name: "Mohnish Pabrai",
     description: "The Dhandho Investor",
     investing_style: "Focuses on value investing and long-term growth.",
-    agent_func: placeholderAgent("mohnish_pabrai"),
+    agent_func: (state) => mohnishPabraiAgent(state, "mohnish_pabrai_agent"),
     order: 6,
   },
   nassim_taleb: {
     display_name: "Nassim Taleb",
     description: "The Black Swan Risk Analyst",
     investing_style: "Focuses on tail risk, antifragility, and asymmetric payoffs.",
-    agent_func: placeholderAgent("nassim_taleb"),
+    agent_func: (state) => nassimTalebAgent(state, "nassim_taleb_agent"),
     order: 7,
   },
   peter_lynch: {
     display_name: "Peter Lynch",
     description: "The 10-Bagger Investor",
     investing_style: "Invests in companies with understandable business models.",
-    agent_func: placeholderAgent("peter_lynch"),
+    agent_func: (state) => peterLynchAgent(state, "peter_lynch_agent"),
     order: 8,
   },
   phil_fisher: {
     display_name: "Phil Fisher",
     description: "The Scuttlebutt Investor",
     investing_style: "Emphasizes companies with strong management.",
-    agent_func: placeholderAgent("phil_fisher"),
+    agent_func: (state) => philFisherAgent(state, "phil_fisher_agent"),
     order: 9,
   },
   rakesh_jhunjhunwala: {
     display_name: "Rakesh Jhunjhunwala",
     description: "The Big Bull Of India",
     investing_style: "Leverages macroeconomic insights.",
-    agent_func: placeholderAgent("rakesh_jhunjhunwala"),
+    agent_func: (state) => rakeshJhunjhunwalaAgent(state, "rakesh_jhunjhunwala_agent"),
     order: 10,
   },
   stanley_druckenmiller: {
     display_name: "Stanley Druckenmiller",
     description: "The Macro Investor",
     investing_style: "Focuses on macroeconomic trends.",
-    agent_func: placeholderAgent("stanley_druckenmiller"),
+    agent_func: (state) => stanleyDruckenmillerAgent(state, "stanley_druckenmiller_agent"),
     order: 11,
   },
   warren_buffett: {
     display_name: "Warren Buffett",
     description: "The Oracle of Omaha",
     investing_style: "Seeks companies with strong fundamentals.",
-    agent_func: placeholderAgent("warren_buffett"),
+    agent_func: (state) => warrenBuffettAgent(state, "warren_buffett_agent"),
     order: 12,
   },
   technical_analyst: {
     display_name: "Technical Analyst",
     description: "Chart Pattern Specialist",
     investing_style: "Focuses on chart patterns and market trends.",
-    agent_func: placeholderAgent("technical_analyst"),
+    agent_func: (state) => technicalAnalystAgent(state, "technical_analyst_agent"),
     order: 13,
   },
   fundamentals_analyst: {
     display_name: "Fundamentals Analyst",
     description: "Financial Statement Specialist",
     investing_style: "Delves into financial statements.",
-    agent_func: placeholderAgent("fundamentals_analyst"),
+    agent_func: (state) => fundamentalsAnalystAgent(state, "fundamentals_analyst_agent"),
     order: 14,
   },
   growth_analyst: {
     display_name: "Growth Analyst",
     description: "Growth Specialist",
     investing_style: "Analyzes growth trends and valuation.",
-    agent_func: placeholderAgent("growth_analyst"),
+    agent_func: (state) => growthAnalystAgent(state, "growth_analyst_agent"),
     order: 15,
   },
   news_sentiment_analyst: {
     display_name: "News Sentiment Analyst",
     description: "News Sentiment Specialist",
     investing_style: "Analyzes news sentiment.",
-    agent_func: placeholderAgent("news_sentiment_analyst"),
+    agent_func: (state) => newsSentimentAgent(state, "news_sentiment_agent"),
     order: 16,
   },
   sentiment_analyst: {
     display_name: "Sentiment Analyst",
     description: "Market Sentiment Specialist",
     investing_style: "Gauges market sentiment.",
-    agent_func: placeholderAgent("sentiment_analyst"),
+    agent_func: (state) => sentimentAnalystAgent(state, "sentiment_analyst_agent"),
     order: 17,
   },
   valuation_analyst: {
     display_name: "Valuation Analyst",
     description: "Company Valuation Specialist",
     investing_style: "Determines the fair value of companies.",
-    agent_func: placeholderAgent("valuation_analyst"),
+    agent_func: (state) => valuationAnalystAgent(state, "valuation_analyst_agent"),
     order: 18,
   },
   portfolio_manager: {
@@ -223,12 +222,14 @@ export function createGraph(
   // Add portfolio manager nodes + corresponding risk managers
   const riskManagerNodes = new Map<string, string>();
   for (const pmId of portfolioManagerNodes) {
-    graph.addNode(pmId, portfolioManagementAgent);
+    const capturedPmId = pmId;
+    graph.addNode(pmId, (state: AgentState) => portfolioManagementAgent(state, capturedPmId));
 
     const suffix = pmId.split("_").pop()!;
     const rmId = `risk_management_agent_${suffix}`;
     riskManagerNodes.set(pmId, rmId);
-    graph.addNode(rmId, riskManagementAgent);
+    const capturedRmId = rmId;
+    graph.addNode(rmId, (state: AgentState) => riskManagementAgent(state, capturedRmId));
   }
 
   // Build connections
@@ -329,4 +330,55 @@ export function getAgentsList(): Array<Record<string, unknown>> {
       investing_style: config.investing_style,
       order: config.order,
     }));
+}
+
+// ─── buildDefaultGraphNodes ───────────────────────────────────────────────────
+/**
+ * Build the list of GraphNode objects for the standard workflow topology.
+ * Generates a unique suffix for each node to match the createGraph() convention.
+ *
+ * Topology: start → analysts → risk_management → portfolio_manager → END
+ *
+ * @param selectedAnalysts Array of analyst keys (e.g. ["warren_buffett", "technicals"])
+ * @returns Array of GraphNode objects ready to pass to createGraph()
+ */
+export function buildDefaultGraphNodes(selectedAnalysts: string[]): GraphNode[] {
+  // Use a fixed short suffix so node IDs are deterministic in CLI context
+  const suffix = "000000";
+  const nodes: GraphNode[] = [];
+
+  for (const analystKey of selectedAnalysts) {
+    if (analystKey in ANALYST_CONFIG && analystKey !== "portfolio_manager") {
+      nodes.push({ id: `${analystKey}_${suffix}`, type: "agent" });
+    }
+  }
+
+  nodes.push({ id: `portfolio_manager_${suffix}`, type: "agent" });
+  return nodes;
+}
+
+// ─── buildDefaultGraphEdges ───────────────────────────────────────────────────
+/**
+ * Build the list of GraphEdge objects for the standard workflow topology.
+ * Each analyst connects directly to the portfolio_manager node; createGraph()
+ * will automatically insert the risk_management node in between.
+ *
+ * @param selectedAnalysts Array of analyst keys (e.g. ["warren_buffett", "technicals"])
+ * @returns Array of GraphEdge objects ready to pass to createGraph()
+ */
+export function buildDefaultGraphEdges(selectedAnalysts: string[]): GraphEdge[] {
+  const suffix = "000000";
+  const edges: GraphEdge[] = [];
+
+  for (const analystKey of selectedAnalysts) {
+    if (analystKey in ANALYST_CONFIG && analystKey !== "portfolio_manager") {
+      edges.push({
+        id: `${analystKey}_${suffix}__portfolio_manager_${suffix}`,
+        source: `${analystKey}_${suffix}`,
+        target: `portfolio_manager_${suffix}`,
+      });
+    }
+  }
+
+  return edges;
 }
