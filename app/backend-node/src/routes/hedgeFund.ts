@@ -13,7 +13,7 @@ import {
 import { createGraph, runGraph, parseHedgeFundResponse, getAgentsList } from "../services/graphService.js";
 import { createPortfolio } from "../services/portfolioService.js";
 import { ApiKeyService } from "../services/apiKeyService.js";
-import { BacktestService } from "../services/backtestService.js";
+import { BacktestService, type BacktestProgressUpdate } from "../services/backtestService.js";
 
 export async function hedgeFundRoutes(server: FastifyInstance): Promise<void> {
   // ─── POST /hedge-fund/run ────────────────────────────────────────────────────
@@ -155,14 +155,14 @@ export async function hedgeFundRoutes(server: FastifyInstance): Promise<void> {
     reply.raw.write(createStartEvent().toSSE());
 
     try {
-      const result = await backtestService.runBacktestAsync((update) => {
+      const result = await backtestService.runBacktestAsync((update: BacktestProgressUpdate) => {
         if (aborted) return;
-        if (update["type"] === "progress") {
+        if (update.type === "progress") {
           reply.raw.write(
-            createProgressUpdateEvent("backtest", `Processing ${update["current_date"]} (${update["current_step"]}/${update["total_dates"]})`).toSSE()
+            createProgressUpdateEvent("backtest", `Processing ${update.current_date} (${update.current_step}/${update.total_dates})`).toSSE()
           );
-        } else if (update["type"] === "backtest_result") {
-          const dayData = update["data"] as Record<string, unknown>;
+        } else if (update.type === "backtest_result") {
+          const dayData = update.data as Record<string, unknown>;
           reply.raw.write(
             createProgressUpdateEvent("backtest", `Completed ${dayData["date"]} - Portfolio: $${Number(dayData["portfolio_value"]).toLocaleString()}`, {
               analysis: JSON.stringify(dayData),
