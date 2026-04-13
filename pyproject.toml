@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "ai-hedge-fund"
+name = "alphaforge"
 version = "1.0.0"
-description = "An AI-powered hedge fund that uses multiple agents to make trading decisions"
+description = "AlphaForge — an AI-powered investment intelligence platform using multiple agents to forge alpha returns"
 authors = ["Your Name <your.email@example.com>"]
 readme = "README.md"
 packages = [
